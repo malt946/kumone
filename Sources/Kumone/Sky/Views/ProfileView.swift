@@ -6,6 +6,9 @@ struct ProfileView: View {
     @EnvironmentObject private var session: SkySession
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var toasts: AppToastCenter
+    @Environment(\.openURL) private var openURL
+
+    private static let feedbackEmail = "3498741040@qq.com"
 
     @State private var showEditName = false
     @State private var draftName = ""
@@ -166,7 +169,7 @@ struct ProfileView: View {
                     }
                     divider
                     actionRow(icon: "envelope", title: "意见反馈") {
-                        toasts.show("感谢反馈，功能开发中")
+                        openFeedback()
                     }
                     divider
                     actionRow(icon: "info.circle", title: "关于我们") {
@@ -186,26 +189,38 @@ struct ProfileView: View {
     }
 
     private var appearanceRow: some View {
-        HStack {
-            Label("外观", systemImage: "circle.lefthalf.filled")
-                .font(.system(size: 15))
-            Spacer()
+        Menu {
             Picker("外观", selection: $settings.appearance) {
                 ForEach(SkyAppearance.allCases) { mode in
                     Text(mode.displayName).tag(mode)
                 }
             }
-            .pickerStyle(.menu)
-            .labelsHidden()
+        } label: {
+            HStack(spacing: 10) {
+                settingIcon("circle.lefthalf.filled")
+                Text("外观")
+                    .font(.system(size: 15))
+                    .foregroundStyle(.primary)
+                Spacer()
+                Text(settings.appearance.displayName)
+                    .font(.system(size: 15))
+                    .foregroundStyle(.secondary)
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 13)
+            .contentShape(Rectangle())
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
+        .buttonStyle(.plain)
     }
 
     private func actionRow(icon: String, title: LocalizedStringKey, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            HStack {
-                Label(title, systemImage: icon)
+            HStack(spacing: 10) {
+                settingIcon(icon)
+                Text(title)
                     .font(.system(size: 15))
                     .foregroundStyle(.primary)
                 Spacer()
@@ -218,6 +233,31 @@ struct ProfileView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+
+    private func openFeedback() {
+        var components = URLComponents()
+        components.scheme = "mailto"
+        components.path = Self.feedbackEmail
+        components.queryItems = [
+            URLQueryItem(name: "subject", value: "光遇身高查询 · 意见反馈")
+        ]
+        guard let url = components.url else {
+            toasts.show("无法打开邮箱：\(Self.feedbackEmail)")
+            return
+        }
+        openURL(url) { accepted in
+            if !accepted {
+                toasts.show("未找到邮箱应用，请联系 \(Self.feedbackEmail)")
+            }
+        }
+    }
+
+    private func settingIcon(_ name: String) -> some View {
+        Image(systemName: name)
+            .font(.system(size: 15))
+            .foregroundStyle(.primary)
+            .frame(width: 22, alignment: .center)
     }
 
     private var divider: some View {

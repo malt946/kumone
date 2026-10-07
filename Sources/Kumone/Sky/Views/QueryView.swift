@@ -54,28 +54,8 @@ struct QueryView: View {
     // MARK: - Hero
 
     private var hero: some View {
-        ZStack(alignment: .bottomLeading) {
-            RoundedRectangle(cornerRadius: Theme.Radius.panel, style: .continuous)
-                .fill(Theme.accentGradient)
-
-            Image(systemName: "figure.walk.motion")
-                .font(.system(size: 120, weight: .bold))
-                .foregroundStyle(.white.opacity(0.12))
-                .offset(x: 200, y: 20)
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text("光遇身高查询")
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundStyle(.white)
-                Text("输入好友码或光遇 ID，一键获取角色身高与体型")
-                    .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.9))
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(20)
-        }
-        .frame(height: 148)
-        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.panel, style: .continuous))
+        HeroCarousel(banners: HeroBanner.all)
+            .padding(.top, 4)
     }
 
     // MARK: - Input
@@ -129,11 +109,12 @@ struct QueryView: View {
 
     // MARK: - Recent
 
+    @ViewBuilder
     private var recentSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                SkySectionHeader(title: "最近查询")
-                if !store.records.isEmpty {
+        if !store.records.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    SkySectionHeader(title: "最近查询")
                     Button("清空") {
                         store.clear()
                         toasts.show("已清空历史记录")
@@ -141,17 +122,7 @@ struct QueryView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 }
-            }
 
-            if store.records.isEmpty {
-                SkyCard {
-                    SkyStateView.empty(
-                        title: "暂无查询记录",
-                        message: "填写好友码或光遇 ID 后点击「开始查询」，结果会保存在这里。",
-                        icon: "clock.arrow.circlepath"
-                    )
-                }
-            } else {
                 ForEach(store.records) { record in
                     recordRow(record)
                 }
