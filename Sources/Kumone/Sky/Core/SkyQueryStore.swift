@@ -35,12 +35,12 @@ final class SkyQueryStore: ObservableObject {
     /// 执行一次查询。真实实现应请求后端；此处返回 mock 结果。
     /// - Throws: `SkyQueryError`。
     @discardableResult
-    func query(nickname: String, accountID: String? = nil) async throws -> SkyQueryResult {
+    func query(accountID: String) async throws -> SkyQueryResult {
         // 模拟网络延迟。
         try? await Task.sleep(for: .milliseconds(600))
 
-        let id = accountID?.trimmingCharacters(in: .whitespaces)
-        guard let id, !id.isEmpty else {
+        let id = accountID.trimmingCharacters(in: .whitespaces)
+        guard !id.isEmpty else {
             throw SkyQueryError.missingAccountID
         }
         if simulateFailure {
@@ -49,10 +49,8 @@ final class SkyQueryStore: ObservableObject {
 
         let height = Double.random(in: 0.05...1.95)
         let result = SkyQueryResult(
-            nickname: nickname.trimmingCharacters(in: .whitespaces).isEmpty ? "旅行者" : nickname,
             accountID: id,
-            height: (height * 100).rounded() / 100,
-            bodyType: SkyBodyType.classify(height)
+            height: (height * 100).rounded() / 100
         )
 
         records.insert(result, at: 0)
@@ -73,17 +71,13 @@ final class SkyQueryStore: ObservableObject {
     private static func seedRecords() -> [SkyQueryResult] {
         [
             SkyQueryResult(
-                nickname: "光之子",
                 accountID: "SKY-88213490",
                 height: 1.42,
-                bodyType: .tall,
                 updatedAt: Date().addingTimeInterval(-3600)
             ),
             SkyQueryResult(
-                nickname: "小矮人",
                 accountID: "SKY-10293847",
                 height: 0.38,
-                bodyType: .petite,
                 updatedAt: Date().addingTimeInterval(-86400)
             ),
         ]

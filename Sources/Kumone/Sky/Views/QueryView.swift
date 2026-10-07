@@ -6,7 +6,6 @@ struct QueryView: View {
     @EnvironmentObject private var store: SkyQueryStore
     @EnvironmentObject private var toasts: AppToastCenter
 
-    @State private var nickname = ""
     @State private var accountID = ""
     @State private var isQuerying = false
     @State private var result: SkyQueryResult?
@@ -62,7 +61,7 @@ struct QueryView: View {
                 Text("光遇身高查询")
                     .font(.system(size: 24, weight: .bold))
                     .foregroundStyle(.white)
-                Text("输入好友码或昵称，一键获取角色身高与体型")
+                Text("输入好友码或光遇 ID，一键获取角色身高与体型")
                     .font(.subheadline)
                     .foregroundStyle(.white.opacity(0.9))
                     .fixedSize(horizontal: false, vertical: true)
@@ -80,7 +79,6 @@ struct QueryView: View {
             VStack(alignment: .leading, spacing: 14) {
                 SkySectionHeader(title: "查询信息")
 
-                field(icon: "person.fill", placeholder: "昵称（选填）", text: $nickname)
                 field(icon: "number", placeholder: "好友码 / 光遇 ID", text: $accountID)
 
                 Button {
@@ -140,7 +138,6 @@ struct QueryView: View {
                 heightBar(for: result)
 
                 VStack(alignment: .leading, spacing: 6) {
-                    detailRow(label: "昵称", value: result.nickname)
                     detailRow(label: "好友码", value: result.accountID)
                     detailRow(label: "更新时间", value: result.updatedAt.formatted(date: .abbreviated, time: .shortened))
                 }
@@ -192,7 +189,7 @@ struct QueryView: View {
                 SkyCard {
                     SkyStateView.empty(
                         title: "暂无查询记录",
-                        message: "填写好友码或昵称后点击「开始查询」，结果会保存在这里。",
+                        message: "填写好友码或光遇 ID 后点击「开始查询」，结果会保存在这里。",
                         icon: "clock.arrow.circlepath"
                     )
                 }
@@ -216,9 +213,9 @@ struct QueryView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(record.nickname)
-                        .font(.system(size: 15, weight: .medium))
                     Text(record.accountID)
+                        .font(.system(size: 15, weight: .medium))
+                    Text(record.updatedAt.formatted(date: .abbreviated, time: .shortened))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -254,7 +251,7 @@ struct QueryView: View {
         errorMessage = nil
         defer { isQuerying = false }
         do {
-            let outcome = try await store.query(nickname: nickname, accountID: accountID)
+            let outcome = try await store.query(accountID: accountID)
             withAnimation(AppAnimation.smooth) {
                 result = outcome
             }

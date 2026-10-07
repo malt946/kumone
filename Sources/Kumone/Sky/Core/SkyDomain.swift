@@ -6,7 +6,6 @@ import SwiftUI
 /// 一次身高查询的结果。
 struct SkyQueryResult: Identifiable, Hashable {
     let id: UUID
-    var nickname: String
     /// 账号唯一标识（光遇 ID / 好友码）。
     var accountID: String
     /// 身高数值，单位为「游戏单位」。
@@ -18,18 +17,32 @@ struct SkyQueryResult: Identifiable, Hashable {
 
     init(
         id: UUID = UUID(),
-        nickname: String,
         accountID: String,
         height: Double,
         bodyType: SkyBodyType,
         updatedAt: Date = Date()
     ) {
         self.id = id
-        self.nickname = nickname
         self.accountID = accountID
         self.height = height
         self.bodyType = bodyType
         self.updatedAt = updatedAt
+    }
+
+    /// 由身高数值自动判定体型档位。
+    init(
+        id: UUID = UUID(),
+        accountID: String,
+        height: Double,
+        updatedAt: Date = Date()
+    ) {
+        self.init(
+            id: id,
+            accountID: accountID,
+            height: height,
+            bodyType: SkyBodyType.classify(height),
+            updatedAt: updatedAt
+        )
     }
 
     /// 归一化后的身高百分比（0...1），用于进度条展示。
