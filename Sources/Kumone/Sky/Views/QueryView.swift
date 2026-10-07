@@ -10,15 +10,14 @@ struct QueryView: View {
     @State private var accountID = ""
     @State private var isQuerying = false
     @State private var result: SkyQueryResult?
+    @State private var errorMessage: String?
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 hero
                 inputCard
-                if let result {
-                    resultCard(result)
-                }
+                resultSection
                 recentSection
                 Color.clear.frame(height: SkyAppRoot.tabBarClearance)
             }
@@ -28,6 +27,23 @@ struct QueryView: View {
         .background(background)
         .navigationTitle("身高查询")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    @ViewBuilder
+    private var resultSection: some View {
+        if isQuerying {
+            SkyCard {
+                SkyStateView.loading("查询中…", message: "正在获取角色身高与体型")
+            }
+        } else if let errorMessage {
+            SkyCard {
+                SkyStateView.error(message: LocalizedStringKey(errorMessage)) {
+                    Task { await runQuery() }
+                }
+            }
+        } else if let result {
+            resultCard(result)
+        }
     }
 
     // MARK: - Hero
@@ -174,11 +190,11 @@ struct QueryView: View {
 
             if store.records.isEmpty {
                 SkyCard {
-                    Text("暂无查询记录")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 12)
+                    SkyStateView.empty(
+                        title: "暂无查询记录",
+                        message: "填写好友码或昵称后点击「开始查询」，结果会保存在这里。",
+                        icon: "clock.arrow.circlepath"
+                    )
                 }
             } else {
                 ForEach(store.records) { record in
@@ -235,12 +251,20 @@ struct QueryView: View {
 
     private func runQuery() async {
         isQuerying = true
+        errorMessage = nil
         defer { isQuerying = false }
-        let outcome = await store.query(nickname: nickname, accountID: accountID)
-        withAnimation(AppAnimation.smooth) {
-            result = outcome
+        do {
+            let outcome = try await store.query(nickname: nickname, accountID: accountID)
+            withAnimation(AppAnimation.smooth) {
+                result = outcome
+            }
+            toasts.show("查询完成：\(outcome.bodyType.displayName)")
+        } catch {
+            withAnimation(AppAnimation.smooth) {
+                result = nil
+                errorMessage = error.localizedDescription
+            }
         }
-        toasts.show("查询完成：\(outcome.bodyType.displayName)")
     }
 
     private var background: some View {

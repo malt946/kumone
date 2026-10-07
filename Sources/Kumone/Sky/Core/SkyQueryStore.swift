@@ -1,12 +1,30 @@
 import Combine
 import Foundation
 
+/// 查询过程中可能抛出的错误。
+enum SkyQueryError: LocalizedError {
+    /// 未填写好友码 / 光遇 ID。
+    case missingAccountID
+    /// 网络或服务端异常。
+    case requestFailed
+
+    var errorDescription: String? {
+        switch self {
+        case .missingAccountID: return String(localized: "请输入好友码或光遇 ID 后再查询。")
+        case .requestFailed: return String(localized: "查询失败，请检查网络后重试。")
+        }
+    }
+}
+
 /// 身高查询服务与历史记录（当前为本地 mock，后续替换为真实接口）。
 @MainActor
 final class SkyQueryStore: ObservableObject {
     static let shared = SkyQueryStore()
 
     @Published private(set) var records: [SkyQueryResult]
+
+    /// 打开后下一次查询必定失败，用于联调错误态（后续接入真实接口时移除）。
+    @Published var simulateFailure = false
 
     private static let maxRecords = 20
 
@@ -15,17 +33,24 @@ final class SkyQueryStore: ObservableObject {
     }
 
     /// 执行一次查询。真实实现应请求后端；此处返回 mock 结果。
+    /// - Throws: `SkyQueryError`。
     @discardableResult
-    func query(nickname: String, accountID: String? = nil) async -> SkyQueryResult {
+    func query(nickname: String, accountID: String? = nil) async throws -> SkyQueryResult {
         // 模拟网络延迟。
         try? await Task.sleep(for: .milliseconds(600))
 
         let id = accountID?.trimmingCharacters(in: .whitespaces)
-        let resolvedID = (id?.isEmpty == false ? id! : "SKY-\(Int.random(in: 10000000...99999999))")
+        guard let id, !id.isEmpty else {
+            throw SkyQueryError.missingAccountID
+        }
+        if simulateFailure {
+            throw SkyQueryError.requestFailed
+        }
+
         let height = Double.random(in: 0.05...1.95)
         let result = SkyQueryResult(
             nickname: nickname.trimmingCharacters(in: .whitespaces).isEmpty ? "旅行者" : nickname,
-            accountID: resolvedID,
+            accountID: id,
             height: (height * 100).rounded() / 100,
             bodyType: SkyBodyType.classify(height)
         )
