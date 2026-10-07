@@ -8,41 +8,47 @@ struct QueryView: View {
 
     @State private var accountID = ""
     @State private var isQuerying = false
-    @State private var result: SkyQueryResult?
+    @State private var sheetResult: SkyQueryResult?
     @State private var errorMessage: String?
+    @FocusState private var isFieldFocused: Bool
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 hero
                 inputCard
-                resultSection
                 recentSection
                 Color.clear.frame(height: SkyAppRoot.tabBarClearance)
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
         }
+        .scrollDismissesKeyboard(.interactively)
         .background(background)
         .navigationTitle("身高查询")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("完成") { isFieldFocused = false }
+            }
+        }
+        .sheet(item: $sheetResult) { result in
+            SkyResultSheet(result: result)
+        }
+        .alert("查询失败", isPresented: errorBinding) {
+            Button("重试") { Task { await runQuery() } }
+            Button("取消", role: .cancel) {}
+        } message: {
+            Text(errorMessage ?? "")
+        }
     }
 
-    @ViewBuilder
-    private var resultSection: some View {
-        if isQuerying {
-            SkyCard {
-                SkyStateView.loading("查询中…", message: "正在获取角色身高与体型")
-            }
-        } else if let errorMessage {
-            SkyCard {
-                SkyStateView.error(message: LocalizedStringKey(errorMessage)) {
-                    Task { await runQuery() }
-                }
-            }
-        } else if let result {
-            resultCard(result)
-        }
+    private var errorBinding: Binding<Bool> {
+        Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )
     }
 
     // MARK: - Hero
@@ -82,6 +88,7 @@ struct QueryView: View {
                 field(icon: "number", placeholder: "好友码 / 光遇 ID", text: $accountID)
 
                 Button {
+                    isFieldFocused = false
                     Task { await runQuery() }
                 } label: {
                     HStack(spacing: 8) {
@@ -106,67 +113,18 @@ struct QueryView: View {
                 .foregroundStyle(.secondary)
                 .frame(width: 20)
             TextField(placeholder, text: text)
+                .focused($isFieldFocused)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
-                .onSubmit { Task { await runQuery() } }
+                .onSubmit {
+                    isFieldFocused = false
+                    Task { await runQuery() }
+                }
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
         .background(.quaternary.opacity(0.4), in: RoundedRectangle(cornerRadius: Theme.Radius.standard, style: .continuous))
-    }
-
-    // MARK: - Result
-
-    private func resultCard(_ result: SkyQueryResult) -> some View {
-        SkyCard {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    SkySectionHeader(title: "查询结果")
-                    SkyBadge(text: result.bodyType.displayName, tint: result.bodyType.tint)
-                }
-
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
-                    Text(String(format: "%.2f", result.height))
-                        .font(.system(size: 44, weight: .bold, design: .rounded))
-                        .foregroundStyle(Theme.accent)
-                    Text("游戏单位")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-
-                heightBar(for: result)
-
-                VStack(alignment: .leading, spacing: 6) {
-                    detailRow(label: "好友码", value: result.accountID)
-                    detailRow(label: "更新时间", value: result.updatedAt.formatted(date: .abbreviated, time: .shortened))
-                }
-            }
-        }
-    }
-
-    private func heightBar(for result: SkyQueryResult) -> some View {
-        GeometryReader { geo in
-            ZStack(alignment: .leading) {
-                Capsule()
-                    .fill(.quaternary.opacity(0.5))
-                Capsule()
-                    .fill(result.bodyType.tint)
-                    .frame(width: max(12, geo.size.width * result.normalized))
-            }
-        }
-        .frame(height: 10)
-    }
-
-    private func detailRow(label: LocalizedStringKey, value: String) -> some View {
-        HStack {
-            Text(label)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Spacer()
-            Text(value)
-                .font(.subheadline.weight(.medium))
-        }
     }
 
     // MARK: - Recent
@@ -240,7 +198,7 @@ struct QueryView: View {
             }
         }
         .onTapGesture {
-            result = record
+            sheetResult = record
         }
     }
 
@@ -252,15 +210,9 @@ struct QueryView: View {
         defer { isQuerying = false }
         do {
             let outcome = try await store.query(accountID: accountID)
-            withAnimation(AppAnimation.smooth) {
-                result = outcome
-            }
-            toasts.show("查询完成：\(outcome.bodyType.displayName)")
+            sheetResult = outcome
         } catch {
-            withAnimation(AppAnimation.smooth) {
-                result = nil
-                errorMessage = error.localizedDescription
-            }
+            errorMessage = error.localizedDescription
         }
     }
 

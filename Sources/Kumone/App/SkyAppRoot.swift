@@ -22,6 +22,7 @@ public struct SkyAppRoot: View {
             SkyTabBar(items: SkyTabBar.items, selection: $selectedTab)
                 .padding(.bottom, 6)
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         .background(Color(.systemBackground).ignoresSafeArea())
         .environmentObject(settings)
         .environmentObject(session)
