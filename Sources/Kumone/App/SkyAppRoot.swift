@@ -60,11 +60,17 @@ public struct SkyAppRoot: View {
         case .query:
             NavigationStack { QueryView() }
         case .tools:
-            NavigationStack { ToolsView() }
+            NavigationStack {
+                ToolsView().toolbar(.hidden, for: .navigationBar)
+            }
         case .store:
-            NavigationStack { StoreView() }
+            NavigationStack {
+                StoreView().toolbar(.hidden, for: .navigationBar)
+            }
         case .profile:
-            NavigationStack { ProfileView() }
+            NavigationStack {
+                ProfileView().toolbar(.hidden, for: .navigationBar)
+            }
         }
     }
 }
