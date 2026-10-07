@@ -1,0 +1,37 @@
+name: Build IPA
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ipa:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.2.app
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: cd ios && xcodegen generate
+
+      - name: Build app
+        run: |
+          xcodebuild build -project ios/KumoneIOS.xcodeproj -scheme KumoneIOS -configuration Release -sdk iphoneos -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+
+      - name: Package IPA
+        run: |
+          mkdir -p out/Payload
+          cp -R build/Build/Products/Release-iphoneos/*.app out/Payload/
+          cd out && zip -r KumoneIOS.ipa Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: KumoneIOS-ipa
+          path: out/KumoneIOS.ipa
+          if-no-files-found: error
