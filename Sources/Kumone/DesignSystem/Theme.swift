@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Design tokens: color, radius, spacing, layout metrics.
 enum Theme {
-    /// NetEase red, tuned slightly warmer for macOS.
+    /// 应用主色：温暖的珊瑚红。
     static let accent = Color(red: 0.925, green: 0.286, blue: 0.286) // #EC4949
     static let accentDeep = Color(red: 0.788, green: 0.161, blue: 0.161) // #C92929
 
@@ -45,7 +45,7 @@ enum Theme {
 
         #if os(iOS)
         enum FloatingChrome {
-            /// Total height of GlassTabBar: 56pt content + 2 * 4pt inset.
+            /// Total height of SkyTabBar: 56pt content + 2 * 4pt inset.
             static let tabBarHeight: CGFloat = 64
             /// Total height of legacy mini player bar: 44pt button + 2 * 4pt vertical padding.
             static let miniPlayerHeight: CGFloat = 52

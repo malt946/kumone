@@ -6,144 +6,79 @@
 
 <div align="center">
 
-<img src="docs/icon.png" width="140" alt="Kumone" />
+# 光遇身高查询
 
-# Kumone
-
-**雲の音 — 原生 macOS 网易云音乐客户端**
-
-SwiftUI 编写 · 直连网易云真实 API · Sparkle 自动更新
-
-[![Platform](https://img.shields.io/badge/platform-macOS%2015%2B-blue?logo=apple)](#构建)
-[![Swift](https://img.shields.io/badge/Swift-6.2-F05138?logo=swift&logoColor=white)](Package.swift)
-[![License](https://img.shields.io/badge/license-LGPL--3.0--only-orange)](LICENSE)
-
-<table>
-  <tr>
-    <td><img src="docs/screenshot-home.png" alt="推荐" /></td>
-    <td><img src="docs/screenshot-nowplaying.png" alt="沉浸播放页" /></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshot-daily.png" alt="每日推荐" /></td>
-    <td><img src="docs/screenshot-lyrics.png" alt="歌词面板" /></td>
-  </tr>
-</table>
+**SwiftUI 编写的 iOS 应用 · 查询《光·遇》角色身高体型 · 内含小工具与会员商城**
 
 </div>
 
-## 名字由来
+## 简介
 
-**Kumone** 取自日语 **雲の音**（*kumo no ne*，「云的声音」），缩合为一个词 —— **雲音**（假名写作 くもね，读作 *kumone*）。呼应网易「云」音乐的「云」字：从云端飘落到你耳边的音乐。
+「光遇身高查询」是一款面向《光·遇》玩家的 iOS 工具类应用，提供身高查询、实用小工具与会员服务。当前仓库处于**空壳阶段**：导航结构、页面骨架与首次启动协议流程已完成，具体业务逻辑与接口将在后续补充。
 
-## 功能
+> 内部模块名（`KumoneCore`、`KumoneIOSFeature`）为迁移期占位，后续会统一重命名；用户可见名称已更新为「光遇身高」。
 
-- 🔐 **扫码登录** — 网易云 App 扫码，Cookie 本地持久化，自动续期
-- 🏠 **推荐** — 每日推荐、私人漫游、心动模式、推荐歌单、雷达歌单（私人雷达系列，按账号个性化）、排行榜、新碟上架、推荐歌手
-- 🧭 **精选** — 分类歌单（精品 / 官方 / 排行榜 / 场景分类）无限滚动
-- 🎵 **播放** — AVPlayer 引擎，标准 ~ Hi-Res 音质可选（黑胶 VIP 可播无损，自动回落），随机 / 单曲循环 / 列表循环，下一首播放队列，灰色歌曲识别
-- 🚗 **CarPlay（iOS，按需开启）** — Now Playing、分类音乐库、播放队列与搜索模板已写入二进制；激活需 [Apple 授权的 CarPlay 音频能力](https://developer.apple.com/contact/carplay/)，大多数账号不会被授予。默认关闭以保证开源源码树可直接编译，详见下方[启用 CarPlay](#启用-carplayios)
-- 🔓 **灰色歌曲解锁** — 原生实现 UnblockNeteaseMusic 核心音源（pyncmd / 酷我 / 酷狗），无版权或试听歌曲自动匹配第三方音源
-- 🖼 **沉浸播放页** — 封面取色渐变背景 + 大封面 + 大字同步歌词（点击播放条封面进入，Esc 退出）
-- 📻 **私人漫游** — 沉浸式 FM 页面，不喜欢 / 切歌
-- 📝 **歌词** — 侧边玻璃面板，逐行同步 + 翻译，点击跳转
-- 🪟 **桌面歌词** — LyricsX 风格悬浮置顶歌词（含翻译），可拖动、位置持久化，所有空间与全屏应用上可见
-- 📚 **音乐库** — 我喜欢的音乐、创建 / 收藏的歌单、收藏专辑、关注歌手、最近播放、音乐云盘
-- ✏️ **歌单管理** — 新建 / 删除 / 收藏歌单、添加 / 移除歌曲、红心
-- 🔍 **搜索** — 综合 / 单曲 / 歌手 / 专辑 / 歌单，热搜词占位
-- ⌨️ **系统集成** — 媒体键 / 控制中心（Now Playing）、听歌打卡、退出后恢复播放队列
-- 🌐 **多语言** — 简体中文与英文界面，跟随系统语言；Sparkle 更新说明双语
+## 功能结构
 
-## 安装
+应用由四个主 Tab 组成，底部为可拖动的悬浮玻璃导航栏：
 
-要求 macOS 15+（Universal：Apple Silicon 与 Intel 均支持）。
+| Tab | 说明 |
+| --- | --- |
+| **查询** | 输入好友码 / 昵称，展示身高数值与体型档位、历史查询记录 |
+| **工具** | 身高换算器、体型对照表、蜡烛计算器、复刻进度、先祖图鉴等入口 |
+| **商城** | 会员权益展示与套餐开通（月卡 / 季卡 / 年卡 / 永久） |
+| **我的** | 个人信息、会员状态（开通时间 / 到期时间 / 剩余天数）与设置 |
 
-### Homebrew
-
-```bash
-brew install owo-network/brew/kumone --cask
-```
-
-### 手动下载
-
-从 [Releases](https://github.com/missuo/kumone/releases/latest) 下载最新的
-`Kumone-x.y.z.zip`，解压后拖入「应用程序」。
-
-应用已使用 Developer ID 签名并通过 Apple 公证，内置 Sparkle 自动更新
-（菜单栏 Kumone → 检查更新…）。
-
-### iOS / iPadOS（侧载）
-
-每次发版都会附带**无签名**的 `Kumone-iOS-x.y.z.ipa`（iOS 16+）。Kumone 是非官方客户端，不会上架 App Store 或 TestFlight，请用侧载工具以自己的 Apple ID 签名安装 —— [AltStore](https://altstore.io)、[SideStore](https://sidestore.io)、[Sideloadly](https://sideloadly.io) 或 Xcode 均可。iOS 26+ 的 Tab Bar 使用系统原生 Liquid Glass；iOS 16–25 则回退为仿制的玻璃栏。
-
-更新：iOS 应用无法自我替换。设置 → 关于 → **检查更新** 会提示是否有新版本并给出下载链接，下载新 IPA 后用同一工具重新安装即可，登录状态与设置会保留。AltStore / SideStore 也可通过 source 自动追踪发布：添加源地址 <https://github.com/missuo/kumone/releases/latest/download/altstore.json>，之后每次发版都会自动出现在更新列表里。
-
-#### 应用内自动更新（仅限 TrollStore / 巨魔）
-
-在装有 **[TrollStore](https://github.com/opa334/TrollStore)（巨魔）** 的设备上，Kumone 可自我更新：设置 → 关于 → **检查更新**（启动时也会检查）会带进度圆环下载新 IPA，并通过 `apple-magnifier://install?url=…` 移交给 TrollStore 一键自动安装 —— 与 Dopamine 的机制相同。此功能**仅在 TrollStore 下可用**：普通 AltStore/SideStore 侧载版以个人证书签名，没有在设备上安装 IPA 的权限，因此会降级为打开发布页手动重新侧载。
-
-### 启用 CarPlay（iOS）
-
-CarPlay 的实现代码已完整存在于 `Sources/Kumone/Core/CarPlay/`，但**默认构建完全不包含 CarPlay**：既没有 `com.apple.developer.carplay-audio` entitlement，也没有 `UISupportsCarPlay` 和 CarPlay scene 声明。该 entitlement 需要先向 Apple 提交 CarPlay 音频应用[申请](https://developer.apple.com/contact/carplay/)并获批，未授权就打开会导致签名失败：
-
-> Entitlement com.apple.developer.carplay-audio not found and could not be
-> included in profile.
-
-因此 CarPlay 改为一条命令按需开启：
-
-```bash
-make configure-carplay   # 开启
-make configure           # 切回默认的无 CarPlay 构建
-```
-
-`make configure-carplay` 会基于 `Config/Info.plist` 与 `Config/KumoneIOS.entitlements` 派生出带 CarPlay 的副本放进 `ios/Config/Generated/`，再写一个 `ios/Config/CarPlay.local.xcconfig` 把构建指过去。这三个文件都不纳入 git，且**完全不改动 Xcode 工程文件** —— 开启 CarPlay 后 `git status` 依然干净，不会产生任何需要 review 的 diff。
-
-拿到 Apple 授权后：
-
-1. 在 [Apple Developer → Identifiers](https://developer.apple.com/account/resources/identifiers/list) 为你的 App ID 勾选 **CarPlay (Audio)** 能力。
-2. 重新生成 provisioning profile 以携带新能力。
-3. 执行 `make configure-carplay`。
-4. `Cmd + Shift + K` 清理后在真机重新构建。
-
-没有车也可以测试：Xcode ▸ Open Developer Tool ▸ Simulator，然后 I/O ▸ External Displays ▸ CarPlay。
+**首次启动**会弹出用户协议与隐私政策同意页，需勾选并同意后方可进入应用。
 
 ## 构建
 
-要求 macOS 15+、Xcode 26+。
+要求 macOS + Xcode 16+、iOS 16.0 及以上设备或模拟器。
 
 ```bash
-swift build                    # 编译
-Scripts/build-app.sh           # 打包 .app（输出 .build/app/Kumone.app）
-Scripts/compile_and_run.sh     # 杀进程 → 重新打包 → 启动
+# 若修改了 ios/project.yml，先重新生成工程（需要 xcodegen）
+make project
+
+# 编译到模拟器
+make ios-build
+
+# 或直接用 Xcode 打开 ios/KumoneIOS.xcworkspace 运行
 ```
 
-## 架构
+命令行方式（等价）：
+
+```bash
+cd ios && xcodegen generate
+xcodebuild build \
+  -project ios/KumoneIOS.xcodeproj \
+  -scheme KumoneIOS \
+  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  CODE_SIGNING_ALLOWED=NO
+```
+
+## 项目结构
 
 ```
 Sources/Kumone/
-├── Core/
-│   ├── API/            # NeteaseCrypto（weapi/eapi 加密）、NeteaseClient（传输 + Cookie）、NeteaseAPI（约 50 个端点）
-│   ├── Models/         # 统一 Track 模型（兼容新旧两种 JSON 格式）、歌词解析器
-│   ├── Player/         # PlayerService（队列 / 随机 / 循环 / FM / URL 解析）、UnblockService、NowPlayingManager
-│   └── Storage/        # AccountStore、SettingsManager、两级图片缓存
-├── DesignSystem/       # 设计 token、按钮样式（hover 缩放 / 行高亮 / chip）、骨架屏、卡片、跑马灯、封面取色
-└── Features/           # 各页面 + 播放条 + 沉浸播放页 + 歌词/队列面板
+├── App/                 # 应用入口、根 Tab 视图、悬浮导航栏、首次协议页
+│   ├── AppTab.swift
+│   ├── SkyAppRoot.swift
+│   ├── SkyTabBar.swift
+│   └── OnboardingView.swift
+├── Sky/                 # 业务领域层与页面
+│   ├── Core/            # 模型、会话、设置、Toast（当前为本地 mock）
+│   └── Views/           # 查询 / 工具 / 商城 / 我的 页面
+│       └── SkyComponents.swift   # 卡片、徽章、按钮等共享组件
+├── DesignSystem/        # Theme 设计令牌与按钮样式
+└── Resources/           # 多语言与隐私清单
+
+ios/
+├── Config/              # Info.plist、entitlements、xcconfig
+├── KumoneIOS/           # Xcode 应用壳（仅入口）
+├── KumoneIOSPackage/    # 承载全部功能代码的 Swift Package
+└── project.yml          # XcodeGen 工程描述
 ```
 
-不依赖任何第三方 API 服务器：weapi（AES-CBC 双层 + RSA）与 eapi（AES-ECB + MD5 摘要）加密为原生 Swift 实现，请求直达 `music.163.com` / `interface.music.163.com`。
+## 说明
 
-## 相关项目
-
-想要 **tvOS** 版本？欢迎使用我朋友 Svend 维护的 [Sonimbus](https://github.com/gee1k/sonimbus) —— 一个 Apple TV 上的网易云音乐客户端。
-
-## Credits
-
-Kumone 是从零编写的 Swift 实现，未复制以下项目的代码，但深度参考了它们的设计与实现思路，在此致谢：
-
-- [YesPlayMusic](https://github.com/qier222/YesPlayMusic)（MIT，© qier222）— 功能设计、网易云 API 端点与行为逻辑的参考
-- [kaset](https://github.com/sozercan/kaset)（MIT，© sozercan）— UI 设计系统、动效与 SwiftPM 打包方案的参考
-- [UnblockNeteaseMusic/server](https://github.com/UnblockNeteaseMusic/server)（LGPL-3.0-only）— 灰色歌曲第三方音源的接口与匹配策略参考（`UnblockService.swift` 为独立的 Swift 重新实现）
-- [LyricsX](https://github.com/ddddxxx/LyricsX)（MPL-2.0，© ddddxxx）— 桌面歌词窗口的设计参考（窗口配置、屏幕比例定位；`DesktopLyrics.swift` 为独立的 SwiftUI 实现）
-
-## 协议与说明
-
-本项目以 [LGPL-3.0-only](LICENSE) 协议开源（随附 [GPL-3.0](COPYING) 文本）。仅供学习交流，音乐数据与版权归网易云音乐及各音源平台所有。不支持下载、无社交功能。
+本项目仅供学习交流，与《光·遇》官方及 thatgamecompany 无任何关联。应用名称、Bundle ID 均为占位，发布前请替换。
