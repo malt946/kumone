@@ -22,17 +22,13 @@ struct QueryView: View {
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
+            .contentShape(Rectangle())
+            .onTapGesture { isFieldFocused = false }
         }
         .scrollDismissesKeyboard(.interactively)
         .background(background)
         .navigationTitle("身高查询")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItemGroup(placement: .keyboard) {
-                Spacer()
-                Button("完成") { isFieldFocused = false }
-            }
-        }
         .sheet(item: $sheetResult) { result in
             SkyResultSheet(result: result)
         }
@@ -65,7 +61,7 @@ struct QueryView: View {
             VStack(alignment: .leading, spacing: 14) {
                 SkySectionHeader(title: "查询信息")
 
-                field(icon: "number", placeholder: "好友码 / 光遇 ID", text: $accountID)
+                field(icon: "person.text.rectangle", placeholder: "好友码 / 光遇 ID", text: $accountID)
 
                 Button {
                     isFieldFocused = false

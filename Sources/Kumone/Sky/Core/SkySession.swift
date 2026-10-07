@@ -56,16 +56,6 @@ final class SkySession: ObservableObject {
         defaults.set(membershipExpiry, forKey: Keys.membershipExpiry)
     }
 
-    /// 退出登录（mock：仅重置本地展示信息）。
-    func signOut() {
-        membershipStart = nil
-        membershipExpiry = nil
-        defaults.removeObject(forKey: Keys.membershipStart)
-        defaults.removeObject(forKey: Keys.membershipExpiry)
-        defaults.removeObject(forKey: Keys.accountID)
-        accountID = Self.makeAccountID()
-    }
-
     private static func makeAccountID() -> String {
         let digits = (0..<8).map { _ in String(Int.random(in: 0...9)) }.joined()
         return "SKY-\(digits)"

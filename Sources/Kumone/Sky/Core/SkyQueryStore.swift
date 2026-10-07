@@ -5,14 +5,9 @@ import Foundation
 enum SkyQueryError: LocalizedError {
     /// 未填写好友码 / 光遇 ID。
     case missingAccountID
-    /// 网络或服务端异常。
-    case requestFailed
 
     var errorDescription: String? {
-        switch self {
-        case .missingAccountID: return String(localized: "请输入好友码或光遇 ID 后再查询。")
-        case .requestFailed: return String(localized: "查询失败，请检查网络后重试。")
-        }
+        String(localized: "请输入好友码或光遇 ID 后再查询。")
     }
 }
 
@@ -22,9 +17,6 @@ final class SkyQueryStore: ObservableObject {
     static let shared = SkyQueryStore()
 
     @Published private(set) var records: [SkyQueryResult]
-
-    /// 打开后下一次查询必定失败，用于联调错误态（后续接入真实接口时移除）。
-    @Published var simulateFailure = false
 
     private static let maxRecords = 20
 
@@ -42,9 +34,6 @@ final class SkyQueryStore: ObservableObject {
         let id = accountID.trimmingCharacters(in: .whitespaces)
         guard !id.isEmpty else {
             throw SkyQueryError.missingAccountID
-        }
-        if simulateFailure {
-            throw SkyQueryError.requestFailed
         }
 
         let height = Double.random(in: 0.05...1.95)
