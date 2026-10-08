@@ -78,3 +78,27 @@ func skyPriceText(_ value: Double) -> String {
     }
     return String(format: "￥%.2f", value)
 }
+
+/// 日期时间格式化：固定输出 `yyyy-MM-dd HH:mm`。
+func skyDateTimeText(_ date: Date) -> String {
+    skyDateTimeFormatter.string(from: date)
+}
+
+/// 日期格式化：固定输出 `yyyy-MM-dd`。
+func skyDateText(_ date: Date) -> String {
+    skyDateFormatter.string(from: date)
+}
+
+private let skyDateTimeFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "zh_CN")
+    formatter.dateFormat = "yyyy-MM-dd HH:mm"
+    return formatter
+}()
+
+private let skyDateFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "zh_CN")
+    formatter.dateFormat = "yyyy-MM-dd"
+    return formatter
+}()

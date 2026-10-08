@@ -140,7 +140,7 @@ struct QueryView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(record.accountID)
                         .font(.system(size: 15, weight: .medium))
-                    Text(record.updatedAt.formatted(date: .abbreviated, time: .shortened))
+                    Text(skyDateTimeText(record.updatedAt))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

@@ -199,6 +199,47 @@ struct MembershipPlan: Identifiable, Hashable {
     ]
 }
 
+/// 支付方式。
+enum PaymentMethod: String, CaseIterable, Identifiable, Hashable {
+    case wechat
+    case alipay
+    case applePay
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .wechat: return String(localized: "微信支付")
+        case .alipay: return String(localized: "支付宝支付")
+        case .applePay: return String(localized: "Apple Pay")
+        }
+    }
+
+    var subtitle: String {
+        switch self {
+        case .wechat: return String(localized: "使用微信安全快捷支付")
+        case .alipay: return String(localized: "使用支付宝快捷支付")
+        case .applePay: return String(localized: "通过 App Store 账户支付")
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .wechat: return "message.fill"
+        case .alipay: return "yensign.circle.fill"
+        case .applePay: return "apple.logo"
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .wechat: return Color(red: 0.18, green: 0.71, blue: 0.32)
+        case .alipay: return Color(red: 0.11, green: 0.55, blue: 0.95)
+        case .applePay: return Color(red: 0.13, green: 0.13, blue: 0.15)
+        }
+    }
+}
+
 /// 商城权益条目。
 struct MembershipBenefit: Identifiable, Hashable {
     let id: String

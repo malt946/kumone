@@ -95,7 +95,7 @@ struct SkyResultSheet: View {
                 SkySectionHeader(title: "详细信息")
                 detailRow(label: "好友码", value: result.accountID)
                 detailRow(label: "体型档位", value: result.bodyType.displayName)
-                detailRow(label: "更新时间", value: result.updatedAt.formatted(date: .abbreviated, time: .shortened))
+                detailRow(label: "更新时间", value: skyDateTimeText(result.updatedAt))
             }
         }
     }

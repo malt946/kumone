@@ -3,9 +3,12 @@ import SwiftUI
 /// 商城页：会员权益展示与套餐开通。
 struct StoreView: View {
     @EnvironmentObject private var session: SkySession
-    @EnvironmentObject private var toasts: AppToastCenter
 
     @State private var selectedPlanID: String = MembershipPlan.all.dropFirst().first?.id ?? ""
+
+    private var selectedPlan: MembershipPlan? {
+        MembershipPlan.all.first { $0.id == selectedPlanID }
+    }
 
     var body: some View {
         ScrollView {
@@ -20,6 +23,9 @@ struct StoreView: View {
         }
         .background(background)
         .navigationTitle("商城")
+        .navigationDestination(for: MembershipPlan.self) { plan in
+            SkyPaymentView(plan: plan)
+        }
     }
 
     // MARK: - Status
@@ -167,14 +173,11 @@ struct StoreView: View {
 
     private var footer: some View {
         VStack(spacing: 12) {
-            Button {
-                guard let plan = MembershipPlan.all.first(where: { $0.id == selectedPlanID }) else { return }
-                session.activate(plan)
-                toasts.show("开通成功：\(plan.title)")
-            } label: {
+            NavigationLink(value: selectedPlan) {
                 Text("立即开通")
             }
             .buttonStyle(SkyPrimaryButtonStyle())
+            .disabled(selectedPlan == nil)
 
             Text("开通即代表同意《会员服务协议》，虚拟商品开通后不支持退款。")
                 .font(.caption2)

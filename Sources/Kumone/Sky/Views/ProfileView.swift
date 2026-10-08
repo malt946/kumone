@@ -151,7 +151,7 @@ struct ProfileView: View {
 
     private func format(_ date: Date?) -> String {
         guard let date else { return "—" }
-        return date.formatted(date: .numeric, time: .omitted)
+        return skyDateText(date)
     }
 
     // MARK: - Settings
