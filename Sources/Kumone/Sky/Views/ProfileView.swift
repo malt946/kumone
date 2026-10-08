@@ -4,6 +4,7 @@ import SwiftUI
 /// 我的页：个人信息、会员状态与设置入口。
 struct ProfileView: View {
     @EnvironmentObject private var session: SkySession
+    @EnvironmentObject private var orderStore: SkyOrderStore
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var toasts: AppToastCenter
     @Environment(\.openURL) private var openURL
@@ -21,6 +22,7 @@ struct ProfileView: View {
             VStack(alignment: .leading, spacing: 20) {
                 profileHeader
                 membershipCard
+                ordersEntry
                 settingsSection
                 Color.clear.frame(height: SkyAppRoot.tabBarClearance)
             }
@@ -46,6 +48,7 @@ struct ProfileView: View {
                     }
             }
             .environmentObject(session)
+            .environmentObject(orderStore)
             .environmentObject(toasts)
             .tint(Theme.accent)
         }
@@ -114,15 +117,14 @@ struct ProfileView: View {
                 }
 
                 if session.isVIP {
-                    infoRow(label: "开通时间", value: format(session.membershipStart))
-                    infoRow(label: "到期时间", value: format(session.membershipExpiry))
+                    infoRow(label: "到期时间", value: formatSeconds(session.membershipExpiry))
                     if let days = session.remainingDays {
                         infoRow(label: "剩余天数", value: "\(days) 天")
                     }
                     Button("续费会员") { showStore = true }
                         .buttonStyle(SkySecondaryButtonStyle())
                 } else if session.isExpired {
-                    Text("你的会员已于 \(format(session.membershipExpiry)) 到期。")
+                    Text("你的会员已于 \(formatSeconds(session.membershipExpiry)) 到期。")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     Button("开通会员") { showStore = true }
@@ -149,9 +151,35 @@ struct ProfileView: View {
         }
     }
 
-    private func format(_ date: Date?) -> String {
+    private func formatSeconds(_ date: Date?) -> String {
         guard let date else { return "—" }
-        return skyDateText(date)
+        return skyDateTimeSecondsText(date)
+    }
+
+    // MARK: - Orders
+
+    private var ordersEntry: some View {
+        NavigationLink {
+            SkyOrdersView()
+        } label: {
+            SkyCard(padding: 14) {
+                HStack(spacing: 12) {
+                    Image(systemName: "receipt")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Theme.accent)
+                        .frame(width: 34, height: 34)
+                        .background(Theme.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                    Text("购买记录")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(.primary)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Settings

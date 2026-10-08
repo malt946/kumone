@@ -200,7 +200,7 @@ struct MembershipPlan: Identifiable, Hashable {
 }
 
 /// 支付方式。
-enum PaymentMethod: String, CaseIterable, Identifiable, Hashable {
+enum PaymentMethod: String, CaseIterable, Identifiable, Hashable, Codable {
     case wechat
     case alipay
 
@@ -226,6 +226,61 @@ enum PaymentMethod: String, CaseIterable, Identifiable, Hashable {
         case .wechat: return "PaymentWechat"
         case .alipay: return "PaymentAlipay"
         }
+    }
+}
+
+/// 订单状态。
+enum SkyOrderStatus: String, Codable, Hashable {
+    case paid
+    case refunded
+
+    var displayName: String {
+        switch self {
+        case .paid: return String(localized: "已支付")
+        case .refunded: return String(localized: "已退款")
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .paid: return Color(red: 0.36, green: 0.78, blue: 0.62)
+        case .refunded: return Color.secondary
+        }
+    }
+}
+
+/// 会员购买订单。
+struct SkyOrder: Identifiable, Hashable, Codable {
+    let id: UUID
+    /// 订单号。
+    var orderNumber: String
+    /// 套餐标题。
+    var planTitle: String
+    /// 实付金额。
+    var amount: Double
+    /// 支付方式。
+    var method: PaymentMethod
+    /// 下单时间。
+    var createdAt: Date
+    /// 订单状态。
+    var status: SkyOrderStatus
+
+    init(
+        id: UUID = UUID(),
+        orderNumber: String,
+        planTitle: String,
+        amount: Double,
+        method: PaymentMethod,
+        createdAt: Date = Date(),
+        status: SkyOrderStatus = .paid
+    ) {
+        self.id = id
+        self.orderNumber = orderNumber
+        self.planTitle = planTitle
+        self.amount = amount
+        self.method = method
+        self.createdAt = createdAt
+        self.status = status
     }
 }
 

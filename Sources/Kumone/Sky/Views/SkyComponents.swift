@@ -84,10 +84,22 @@ func skyDateTimeText(_ date: Date) -> String {
     skyDateTimeFormatter.string(from: date)
 }
 
+/// 日期时间格式化：固定输出 `yyyy-MM-dd HH:mm:ss`（精确到秒）。
+func skyDateTimeSecondsText(_ date: Date) -> String {
+    skyDateTimeSecondsFormatter.string(from: date)
+}
+
 /// 日期格式化：固定输出 `yyyy-MM-dd`。
 func skyDateText(_ date: Date) -> String {
     skyDateFormatter.string(from: date)
 }
+
+private let skyDateTimeSecondsFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "zh_CN")
+    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    return formatter
+}()
 
 private let skyDateTimeFormatter: DateFormatter = {
     let formatter = DateFormatter()

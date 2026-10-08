@@ -5,6 +5,7 @@ struct SkyPaymentView: View {
     let plan: MembershipPlan
 
     @EnvironmentObject private var session: SkySession
+    @EnvironmentObject private var orderStore: SkyOrderStore
     @EnvironmentObject private var toasts: AppToastCenter
     @Environment(\.dismiss) private var dismiss
 
@@ -155,6 +156,7 @@ struct SkyPaymentView: View {
         Task {
             try? await Task.sleep(for: .seconds(2))
             session.activate(plan)
+            orderStore.add(plan: plan, method: method)
             toasts.show("开通成功：\(plan.title)（\(method.title)）")
             dismiss()
         }

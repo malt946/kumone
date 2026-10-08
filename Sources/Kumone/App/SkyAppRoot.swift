@@ -5,6 +5,7 @@ public struct SkyAppRoot: View {
     @StateObject private var settings = AppSettings.shared
     @StateObject private var session = SkySession.shared
     @StateObject private var queryStore = SkyQueryStore.shared
+    @StateObject private var orderStore = SkyOrderStore.shared
     @StateObject private var toasts = AppToastCenter.shared
 
     @State private var selectedTab: AppTab = .query
@@ -27,6 +28,7 @@ public struct SkyAppRoot: View {
         .environmentObject(settings)
         .environmentObject(session)
         .environmentObject(queryStore)
+        .environmentObject(orderStore)
         .environmentObject(toasts)
         .tint(Theme.accent)
         .preferredColorScheme(settings.appearance.colorScheme)
