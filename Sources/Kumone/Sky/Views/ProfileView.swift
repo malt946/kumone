@@ -115,11 +115,11 @@ struct ProfileView: View {
                 }
 
                 NavigationLink {
-                    SkyMembershipDetailView()
+                    SkyOrdersView()
                 } label: {
-                    Text("详情")
+                    Text("购买记录")
                 }
-                .buttonStyle(detailButtonStyle)
+                .buttonStyle(SkySecondaryButtonStyle())
             }
         }
     }
@@ -133,13 +133,6 @@ struct ProfileView: View {
             Text(value)
                 .font(.subheadline.weight(.medium))
         }
-    }
-
-    private var detailButtonStyle: some ButtonStyle {
-        if session.isVIP {
-            return AnyButtonStyle(SkySecondaryButtonStyle())
-        }
-        return AnyButtonStyle(SkyPrimaryButtonStyle())
     }
 
     private func formatSeconds(_ date: Date?) -> String {
