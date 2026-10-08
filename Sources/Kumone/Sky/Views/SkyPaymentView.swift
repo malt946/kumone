@@ -87,11 +87,10 @@ struct SkyPaymentView: View {
             withAnimation(AppAnimation.quick) { method = option }
         } label: {
             HStack(spacing: 14) {
-                Image(systemName: option.icon)
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.white)
+                Image(option.iconAsset)
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: 38, height: 38)
-                    .background(option.tint, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(option.title)
