@@ -4,7 +4,6 @@ import SwiftUI
 /// 我的页：个人信息、会员状态与设置入口。
 struct ProfileView: View {
     @EnvironmentObject private var session: SkySession
-    @EnvironmentObject private var orderStore: SkyOrderStore
     @EnvironmentObject private var settings: AppSettings
     @EnvironmentObject private var toasts: AppToastCenter
     @Environment(\.openURL) private var openURL
@@ -13,7 +12,6 @@ struct ProfileView: View {
 
     @State private var showEditName = false
     @State private var draftName = ""
-    @State private var showStore = false
     @State private var showAgreement = false
     @State private var showPrivacy = false
 
@@ -22,7 +20,6 @@ struct ProfileView: View {
             VStack(alignment: .leading, spacing: 20) {
                 profileHeader
                 membershipCard
-                ordersEntry
                 settingsSection
                 Color.clear.frame(height: SkyAppRoot.tabBarClearance)
             }
@@ -37,20 +34,6 @@ struct ProfileView: View {
                 if !name.isEmpty { session.nickname = name }
             }
             Button("取消", role: .cancel) {}
-        }
-        .sheet(isPresented: $showStore) {
-            NavigationStack {
-                StoreView()
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button("完成") { showStore = false }
-                        }
-                    }
-            }
-            .environmentObject(session)
-            .environmentObject(orderStore)
-            .environmentObject(toasts)
-            .tint(Theme.accent)
         }
         .sheet(isPresented: $showAgreement) { LegalDocumentView(kind: .agreement) }
         .sheet(isPresented: $showPrivacy) { LegalDocumentView(kind: .privacy) }
@@ -121,21 +104,22 @@ struct ProfileView: View {
                     if let days = session.remainingDays {
                         infoRow(label: "剩余天数", value: "\(days) 天")
                     }
-                    Button("续费会员") { showStore = true }
-                        .buttonStyle(SkySecondaryButtonStyle())
                 } else if session.isExpired {
                     Text("你的会员已于 \(formatSeconds(session.membershipExpiry)) 到期。")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                    Button("开通会员") { showStore = true }
-                        .buttonStyle(SkyPrimaryButtonStyle())
                 } else {
                     Text("尚未开通会员，开通后可解锁全部功能与高级工具。")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                    Button("开通会员") { showStore = true }
-                        .buttonStyle(SkyPrimaryButtonStyle())
                 }
+
+                NavigationLink {
+                    SkyMembershipDetailView()
+                } label: {
+                    Text("详情")
+                }
+                .buttonStyle(detailButtonStyle)
             }
         }
     }
@@ -151,35 +135,16 @@ struct ProfileView: View {
         }
     }
 
+    private var detailButtonStyle: some ButtonStyle {
+        if session.isVIP {
+            return AnyButtonStyle(SkySecondaryButtonStyle())
+        }
+        return AnyButtonStyle(SkyPrimaryButtonStyle())
+    }
+
     private func formatSeconds(_ date: Date?) -> String {
         guard let date else { return "—" }
         return skyDateTimeSecondsText(date)
-    }
-
-    // MARK: - Orders
-
-    private var ordersEntry: some View {
-        NavigationLink {
-            SkyOrdersView()
-        } label: {
-            SkyCard(padding: 14) {
-                HStack(spacing: 12) {
-                    Image(systemName: "receipt")
-                        .font(.system(size: 16))
-                        .foregroundStyle(Theme.accent)
-                        .frame(width: 34, height: 34)
-                        .background(Theme.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 9, style: .continuous))
-                    Text("购买记录")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(.primary)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(.tertiary)
-                }
-            }
-        }
-        .buttonStyle(.plain)
     }
 
     // MARK: - Settings
