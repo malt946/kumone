@@ -71,6 +71,21 @@ struct SkySecondaryButtonStyle: ButtonStyle {
     }
 }
 
+/// 类型擦除的按钮样式，用于在运行时切换不同样式。
+struct AnyButtonStyle: ButtonStyle {
+    private let makeBodyClosure: (Configuration) -> AnyView
+
+    init<S: ButtonStyle>(_ style: S) {
+        makeBodyClosure = { configuration in
+            AnyView(style.makeBody(configuration: configuration))
+        }
+    }
+
+    func makeBody(configuration: Configuration) -> some View {
+        makeBodyClosure(configuration)
+    }
+}
+
 /// 金额格式化，整数不显示小数。
 func skyPriceText(_ value: Double) -> String {
     if value == value.rounded() {

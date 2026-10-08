@@ -38,12 +38,12 @@ struct SkyMembershipDetailView: View {
                 }
 
                 if session.isVIP {
-                    infoRow(label: "到期时间", value: skyDateTimeSecondsText(session.membershipExpiry))
+                    infoRow(label: "到期时间", value: formatSeconds(session.membershipExpiry))
                     if let days = session.remainingDays {
                         infoRow(label: "剩余天数", value: "\(days) 天")
                     }
                 } else if session.isExpired {
-                    Text("你的会员已于 \(skyDateTimeSecondsText(session.membershipExpiry)) 到期。")
+                    Text("你的会员已于 \(formatSeconds(session.membershipExpiry)) 到期。")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 } else {
@@ -53,6 +53,11 @@ struct SkyMembershipDetailView: View {
                 }
             }
         }
+    }
+
+    private func formatSeconds(_ date: Date?) -> String {
+        guard let date else { return "—" }
+        return skyDateTimeSecondsText(date)
     }
 
     private func infoRow(label: LocalizedStringKey, value: String) -> some View {
